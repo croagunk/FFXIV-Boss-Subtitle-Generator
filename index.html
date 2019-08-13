@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>FFXIV Boss Subtitle Generator</title>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/css/uikit.min.css" integrity="sha256-1NCiLO1eL8xsDn3wFHlM37FhxQjBruKz/veyTbWSWHk=" crossorigin="anonymous">
     <style>
         [v-cloak] {
             display: none;
@@ -24,17 +25,54 @@
 </head>
 
 <body>
-    <div id="app" v-cloak>
-        <input type="file" name="image" accept="image/png, image/jpeg" @change="onFileSelected" />
-        <hr>
-        <div v-show="isImageSelected">
-            1行目: <input type="text" v-model="subtitles.upper" @input="" /><br>
-            2行目: <input type="text" v-model="subtitles.lower" @input="" />
-            <hr>
+    <header class="uk-section-xsmall uk-section-default uk-box-shadow-small" uk-sticky="show-on-up: true; animation: uk-aimation-slide-top;">
+        <div class="uk-container uk-container-expand">
+            <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
+                <div class="uk-navbar-left"></div>
+                <div class="uk-navbar-center"><a class="uk-navbar-item" href="#">FFXIV Boss Subtitle Generator</a></div>
+                <div class="uk-navbar-right"></div>
+            </nav>
         </div>
-        <canvas id="result" :width="resultCanvas.width" :height="resultCanvas.height"></canvas>
-    </div>
+    </header>
+    <main class="uk-margin-left uk-margin-right" id="app" v-cloak>
+        <section class="uk-section uk-padding-small" id="s-file">
+            <h1 class="uk-h1">画像選択</h1>
+            <div class="uk-form-custom">
+                <input type="file" accept="image/png, image/jpeg" @change="onFileSelected" />
+                <button class="uk-button uk-button-default" type="button" tabindex="-1">
+                    <span uk-icon="icon: upload"></span>
+                    使用する画像ファイルを選択
+                </button>
+            </div>
+            <span class="uk-text-middle uk-margin-left">{{ file !== null ? file.name : '選択されていません' }}</span>
+        </section>
+        <section class="uk-section uk-padding-small" id="s-data" v-show="isImageSelected">
+            <h1 class="uk-h1">テキスト入力</h1>
+            <div class="uk-form-stacked">
+                <div>
+                    <input class="uk-input" id="subtitle-upper" type="text" placeholder="1行目" v-model="subtitles.upper" />
+                </div>
+                <div>
+                    <input class="uk-input" id="subtitle-lower" type="text" placeholder="2行目" v-model="subtitles.lower" />
+                </div>
+            </div>
+        </section>
+        <section class="uk-section uk-padding-small" id="s-result" v-show="isImageSelected">
+            <h1 class="uk-h1">生成結果</h1>
+            <!-- <div class="uk-form-custom">
+                <button class="uk-button uk-button-primary" @click="downloadImage">
+                    <span uk-icon="icon: download"></span>
+                    画像をダウンロード
+                </button>
+            </div> -->
+            <div class="uk-align-center" id="s-result-container">
+                <canvas id="result" :width="resultCanvas.width" :height="resultCanvas.height"></canvas>
+            </div>
+        </section>
+    </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/js/uikit.min.js" integrity="sha256-Si/RSqVaI2Nt0NBCIADY5gtwKd6MVxsARUchEjnOoh4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/js/uikit-icons.min.js" integrity="sha256-xx24qw2IGUl97Dv7hUvw9UKnw2G7iVq+MmE4nkM/WJs=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js" integrity="sha256-chlNFSVx3TdcQ2Xlw7SvnbLAavAQLO0Y/LBiWX04viY=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/createjs@1.0.1/builds/1.0.0/createjs.min.js" integrity="sha256-2wdA6xeHmnRYyJJeIH/YDKhCT4DdzeLN+8T39bRO7R0=" crossorigin="anonymous"></script>
     <script>
@@ -47,6 +85,7 @@
                     width: 0,
                     height: 0,
                 },
+                file: null,
                 image: null,
                 subtitles: {
                     upper: '',
@@ -74,25 +113,29 @@
                         this.drawCanvas();
                     },
                     deep: true,
-                }
+                },
+                file: function (val, oldVal) {
+                    // 選択されたファイルの Blob URL を取得する
+                    let src = window.URL.createObjectURL(this.file);
+                    // 画像を読み込む
+                    this.loadImage(src);
+                },
             },
             mounted: function () {
                 // Stage
-                this.stage = new cjs.Stage(this.$el.children.result);
+                this.stage = new cjs.Stage(this.$el.children['s-result'].children["s-result-container"].children['result']);
                 cjs.Ticker.addEventListener('tick', this.stage);
             },
             methods: {
                 onFileSelected: function (e) {
                     e.preventDefault();
-                    // 選択されたファイルの Blob URL を取得する
+                    // 選択されたファイルの情報を取得
                     let file = e.target.files[0];
                     if (file === undefined) {
                         // キャンセルされた場合は何もしない
                         return;
                     }
-                    let src = window.URL.createObjectURL(file);
-                    // 画像を読み込む
-                    this.loadImage(src);
+                    this.file = file;
                 },
                 loadImage: function (src) {
                     console.log('loadImage():', 'src=' + src);
