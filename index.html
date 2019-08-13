@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>FFXIV Boss Subtitle Generator</title>
+
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        canvas {
+            width: 90vw;
+        }
+
+        @font-face {
+            font-family: 'Yu Mincho Demibold';
+            src: local('Yu Mincho Demibold');
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <input type="file" name="image" accept="image/png, image/jpeg" @change="onFileSelected" />
+        <hr>
+        <div v-show="isImageSelected">
+            1行目: <input type="text" v-model="subtitles.upper" @input="" /><br>
+            2行目: <input type="text" v-model="subtitles.lower" @input="" />
+            <hr>
+        </div>
+        <canvas id="result" :width="resultCanvas.width" :height="resultCanvas.height"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js" integrity="sha256-chlNFSVx3TdcQ2Xlw7SvnbLAavAQLO0Y/LBiWX04viY=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/createjs@1.0.1/builds/1.0.0/createjs.min.js" integrity="sha256-2wdA6xeHmnRYyJJeIH/YDKhCT4DdzeLN+8T39bRO7R0=" crossorigin="anonymous"></script>
+    <script>
+        const cjs = createjs;
+        const app = new Vue({
+            el: '#app',
+            data: {
+                isImageSelected: false,
+                resultCanvas: {
+                    width: 0,
+                    height: 0,
+                },
+                image: null,
+                subtitles: {
+                    upper: '',
+                    lower: '',
+                },
+            },
+            computed: {
+                subtitleUpper: function () {
+                    return this.subtitles.upper.split('').join(' ');
+                },
+                subtitleLower: function () {
+                    return this.subtitles.lower.split('').join(' ');
+                },
+            },
+            watch: {
+                image: function (val, oldVal) {
+                    if (val != null) {
+                        this.isImageSelected = true;
+                    } else {
+                        this.isImageSelected = false;
+                    }
+                },
+                subtitles: {
+                    handler: function (val, oldVal) {
+                        this.drawCanvas();
+                    },
+                    deep: true,
+                }
+            },
+            mounted: function () {
+                // Stage
+                this.stage = new cjs.Stage(this.$el.children.result);
+                cjs.Ticker.addEventListener('tick', this.stage);
+            },
+            methods: {
+                onFileSelected: function (e) {
+                    e.preventDefault();
+                    // 選択されたファイルの Blob URL を取得する
+                    let file = e.target.files[0];
+                    if (file === undefined) {
+                        // キャンセルされた場合は何もしない
+                        return;
+                    }
+                    let src = window.URL.createObjectURL(file);
+                    // 画像を読み込む
+                    this.loadImage(src);
+                },
+                loadImage: function (src) {
+                    console.log('loadImage():', 'src=' + src);
+                    let image = new Image();
+                    image.onload = () => {
+                        // キャンバスサイズを画像に合わせる
+                        this.resultCanvas.width = image.naturalWidth;
+                        this.resultCanvas.height = image.naturalHeight;
+                    };
+                    image.src = src;
+                    this.image = image;
+                    // キャンバスを初期化
+                    this.resetCanvas();
+                },
+                drawCanvas: function () {
+                    this.resetCanvas();
+                    this.drawSubtitleLine();
+                    this.drawSubtitleUpper();
+                    this.drawSubtitleLower();
+                },
+                resetCanvas: function () {
+                    // Stage の子要素をクリア
+                    this.stage.removeAllChildren();
+                    // 参照画像を追加
+                    this.stage.addChild(new cjs.Bitmap(this.image));
+                },
+                drawSubtitleLine: function () {
+                    // 線の長さ・大きさ
+                    let lineLength = parseInt(this.resultCanvas.width * (2.5 / 4.5));
+                    let lineSize = 3;
+                    // 線の位置
+                    let left = parseInt(this.resultCanvas.width * (1.0 / 4.5));
+                    let top = parseInt(this.resultCanvas.height * (2.5 / 3.5) - Math.floor(lineSize / 2));
+
+                    // 線の影
+                    let g1 = new cjs.Graphics();
+                    g1.beginStroke('black')
+                        .setStrokeStyle(lineSize + 2)
+                        .moveTo(left - 1, top)
+                        .lineTo(left + lineLength + 1, top)
+                        .endStroke();
+                    let s1 = new cjs.Shape(g1);
+                    s1.shadow = new cjs.Shadow('black', 0, 0, (lineSize + 2) * 2);
+
+                    // 線の影を濃くするため 2 度描画する
+                    this.stage.addChild(s1);
+                    this.stage.addChild(s1);
+
+                    // 線の本体
+                    let g2 = new cjs.Graphics();
+                    g2.beginStroke('white')
+                        .setStrokeStyle(lineSize)
+                        .moveTo(left, top)
+                        .lineTo(left + lineLength, top)
+                        .endStroke();
+                    let s2 = new cjs.Shape(g2);
+
+                    // 線を描画する
+                    this.stage.addChild(s2);
+                },
+                drawSubtitleUpper: function () {
+                    // フォント
+                    let fontFamily = 'Yu Mincho Demibold';
+                    let fontSize = 48;
+                    let font = fontSize + 'px ' + fontFamily;
+                    // 文字の位置
+                    let left = parseInt(this.resultCanvas.width / 2);
+                    let top = parseInt(this.resultCanvas.height * (2.5 / 3.5) - fontSize);
+
+                    // 文字
+                    var t = new cjs.Text(this.subtitleUpper, font, 'white');
+                    t.x = left;
+                    t.y = top;
+                    t.textAlign = 'center';
+                    t.textBaseline = 'middle';
+                    t.shadow = new cjs.Shadow('black', 0, 0, fontSize / 4);
+
+                    this.stage.addChild(t);
+                },
+                drawSubtitleLower: function () {
+                    // フォント
+                    let fontFamily = 'Yu Mincho Demibold';
+                    let fontSize = 48;
+                    let font = fontSize + 'px ' + fontFamily;
+                    // 文字の位置
+                    let left = parseInt(this.resultCanvas.width / 2);
+                    let top = parseInt(this.resultCanvas.height * (2.5 / 3.5) + fontSize);
+
+                    // 文字
+                    var t = new cjs.Text(this.subtitleLower, font, 'white');
+                    t.x = left;
+                    t.y = top;
+                    t.textAlign = 'center';
+                    t.textBaseline = 'middle';
+                    t.shadow = new cjs.Shadow('black', 0, 0, fontSize / 4);
+
+                    this.stage.addChild(t);
+                },
+            },
+        })
+    </script>
+</body>
+
+</html>
