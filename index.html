@@ -78,7 +78,7 @@
             <div class="uk-align-center" id="s-result-container">
                 <canvas id="result" :width="resultCanvas.width" :height="resultCanvas.height"></canvas>
                 <div style="display: none;">
-                    <a id="download-image" target="_blank" download>download</a>
+                    <a id="download-image">download</a>
                 </div>
             </div>
         </section>
@@ -170,20 +170,21 @@
                     this.file = file;
                 },
                 loadImage: function (src) {
-                    console.log('loadImage():', 'src=' + src);
                     let image = new Image();
                     image.onload = () => {
                         // キャンバスサイズを画像に合わせる
                         this.resultCanvas.width = image.naturalWidth;
                         this.resultCanvas.height = image.naturalHeight;
+
+                        this.image = image;
+                        // 入力中の文字を消去
+                        this.subtitles.upper = '';
+                        this.subtitles.lower = '';
+
+                        // キャンバスを初期状態で描画
+                        this.drawCanvas();
                     };
                     image.src = src;
-                    this.image = image;
-                    // 入力中の文字を消去
-                    this.subtitles.upper = '';
-                    this.subtitles.lower = '';
-                    // キャンバスを初期状態で描画
-                    this.drawCanvas();
                 },
                 drawCanvas: function () {
                     this.resetCanvas();
@@ -280,26 +281,28 @@
 
                     this.stage.addChild(t2);
                 },
-                downloadImage: function (e) {
-                    e.preventDefault();
-                    // Canvas 上のイメージを Base64 エンコード
+                downloadImage: function () {
                     let canvas = document.getElementById('result');
-                    let base64EncodedImage = canvas.toDataURL('image/png');
-                    // Base64 イメージを Blob に変換
-                    let t = base64EncodedImage.split(',');
-                    let d = atob(t[1]);
-                    let mime = t[0].split(':')[1].split(';')[0];
-                    let buf = new Uint8Array(d.length);
-                    for (let i = 0; i < d.length; ++i) {
-                        buf[i] = d.charCodeAt(i);
+                    let base64 = canvas.toDataURL();
+                    let blob = this.base64toBlob(base64);
+                    let dlFileName = 'xivbosssub_' + (new Date()).getTime() + '.png';
+
+                    let a = document.getElementById('download-image');
+                    a.href = window.URL.createObjectURL(blob);
+                    a.download = dlFileName;
+                    a.click();
+                },
+                base64toBlob: function (base64) {
+                    // https://st40.xyz/one-run/article/133/
+                    let tmp = base64.split(',');
+                    let data = atob(tmp[1]);
+                    let mime = tmp[0].split(':')[1].split(';')[0];
+                    let buf = new Uint8Array(data.length);
+                    for (let i = 0; i < data.length; ++i) {
+                        buf[i] = data.charCodeAt(i);
                     }
                     let blob = new Blob([buf], { type: mime });
-                    // ダウンロード
-                    let u = (window.URL || window.webkitURL);
-                    let du = u.createObjectURL(blob);
-                    let a = document.getElementById('download-image');
-                    a.href = du;
-                    a.click();
+                    return blob;
                 },
             },
         })
