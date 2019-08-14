@@ -38,7 +38,7 @@
         <section class="uk-section uk-padding-small" id="s-file">
             <h1 class="uk-h1">画像選択</h1>
             <div class="uk-form-custom">
-                <input type="file" accept="image/png, image/jpeg" @change="onFileSelected" />
+                <input type="file" accept="image/png, image/jpeg" @change="fileSelected" />
                 <button class="uk-button uk-button-default" type="button" tabindex="-1">
                     <span uk-icon="icon: upload"></span>
                     使用する画像ファイルを選択
@@ -59,12 +59,13 @@
         </section>
         <section class="uk-section uk-padding-small" id="s-result" v-show="isImageSelected">
             <h1 class="uk-h1">生成結果</h1>
-            <!-- <div class="uk-form-custom">
+            <div class="uk-form-custom">
                 <button class="uk-button uk-button-primary" @click="downloadImage">
                     <span uk-icon="icon: download"></span>
                     画像をダウンロード
                 </button>
-            </div> -->
+            </div>
+            <a id="download-image" download="image.png" style="display: none;">download</a>
             <div class="uk-align-center" id="s-result-container">
                 <canvas id="result" :width="resultCanvas.width" :height="resultCanvas.height"></canvas>
             </div>
@@ -127,7 +128,7 @@
                 cjs.Ticker.addEventListener('tick', this.stage);
             },
             methods: {
-                onFileSelected: function (e) {
+                fileSelected: function (e) {
                     e.preventDefault();
                     // 選択されたファイルの情報を取得
                     let file = e.target.files[0];
@@ -177,12 +178,14 @@
                         .moveTo(left - 1, top)
                         .lineTo(left + lineLength + 1, top)
                         .endStroke();
-                    let s1 = new cjs.Shape(g1);
-                    s1.shadow = new cjs.Shadow('black', 0, 0, (lineSize + 2) * 2);
+                    let s1a = new cjs.Shape(g1);
+                    let s1b = new cjs.Shape(g1);
+                    s1a.shadow = new cjs.Shadow('black', 0, 0, (lineSize + 2) * 2);
+                    s1b.shadow = new cjs.Shadow('black', 0, 0, (lineSize + 2) * 2);
 
-                    // 線の影を濃くするため 2 度描画する
-                    this.stage.addChild(s1);
-                    this.stage.addChild(s1);
+                    // 線の影を濃くするため2度描画する
+                    this.stage.addChild(s1a);
+                    this.stage.addChild(s1b);
 
                     // 線の本体
                     let g2 = new cjs.Graphics();
@@ -205,15 +208,25 @@
                     let left = parseInt(this.resultCanvas.width / 2);
                     let top = parseInt(this.resultCanvas.height * (2.5 / 3.5) - fontSize);
 
-                    // 文字
-                    var t = new cjs.Text(this.subtitleUpper, font, 'white');
-                    t.x = left;
-                    t.y = top;
-                    t.textAlign = 'center';
-                    t.textBaseline = 'middle';
-                    t.shadow = new cjs.Shadow('black', 0, 0, fontSize / 4);
+                    // 文字の影
+                    var t1 = new cjs.Text(this.subtitleUpper, font, 'black');
+                    t1.x = left;
+                    t1.y = top;
+                    t1.textAlign = 'center';
+                    t1.textBaseline = 'middle';
+                    t1.shadow = new cjs.Shadow('black', 0, 0, fontSize / 4);
 
-                    this.stage.addChild(t);
+                    this.stage.addChild(t1);
+
+                    // 文字
+                    var t2 = new cjs.Text(this.subtitleUpper, font, 'white');
+                    t2.x = left;
+                    t2.y = top;
+                    t2.textAlign = 'center';
+                    t2.textBaseline = 'middle';
+                    t2.shadow = new cjs.Shadow('black', 0, 0, fontSize / 4);
+
+                    this.stage.addChild(t2);
                 },
                 drawSubtitleLower: function () {
                     // フォント
@@ -224,15 +237,32 @@
                     let left = parseInt(this.resultCanvas.width / 2);
                     let top = parseInt(this.resultCanvas.height * (2.5 / 3.5) + fontSize);
 
-                    // 文字
-                    var t = new cjs.Text(this.subtitleLower, font, 'white');
-                    t.x = left;
-                    t.y = top;
-                    t.textAlign = 'center';
-                    t.textBaseline = 'middle';
-                    t.shadow = new cjs.Shadow('black', 0, 0, fontSize / 4);
+                    // 文字の影
+                    var t1 = new cjs.Text(this.subtitleLower, font, 'black');
+                    t1.x = left;
+                    t1.y = top;
+                    t1.textAlign = 'center';
+                    t1.textBaseline = 'middle';
+                    t1.shadow = new cjs.Shadow('black', 0, 0, fontSize / 4);
 
-                    this.stage.addChild(t);
+                    this.stage.addChild(t1);
+
+                    // 文字
+                    var t2 = new cjs.Text(this.subtitleLower, font, 'white');
+                    t2.x = left;
+                    t2.y = top;
+                    t2.textAlign = 'center';
+                    t2.textBaseline = 'middle';
+                    t2.shadow = new cjs.Shadow('black', 0, 0, fontSize / 4);
+
+                    this.stage.addChild(t2);
+                },
+                downloadImage: function (e) {
+                    //
+                    let cv = document.getElementById('result');
+                    let lk = document.getElementById('download-image');
+                    lk.href = cv.toDataURL();
+                    lk.click();
                 },
             },
         })
