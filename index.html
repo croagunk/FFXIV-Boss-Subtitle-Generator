@@ -65,7 +65,7 @@
                     画像をダウンロード
                 </button>
             </div>
-            <a id="download-image" download="image.png" style="display: none;">download</a>
+            <a id="download-image" tardet="_blank" download style="display: none;">download</a>
             <div class="uk-align-center" id="s-result-container">
                 <canvas id="result" :width="resultCanvas.width" :height="resultCanvas.height"></canvas>
             </div>
@@ -183,9 +183,9 @@
                     s1a.shadow = new cjs.Shadow('black', 0, 0, (lineSize + 2) * 2);
                     s1b.shadow = new cjs.Shadow('black', 0, 0, (lineSize + 2) * 2);
 
-                    // 線の影を濃くするため2度描画する
+                    //// 線の影を濃くするため2度描画する
                     this.stage.addChild(s1a);
-                    this.stage.addChild(s1b);
+                    //this.stage.addChild(s1b);
 
                     // 線の本体
                     let g2 = new cjs.Graphics();
