@@ -147,12 +147,15 @@
                 },
                 lineLength: function () {
                     let s = Math.min(this.resultCanvas.width, this.resultCanvas.height);
-                    let l = Math.min(s * (16 / 9), Math.max(this.resultCanvas.width, this.resultCanvas.height));
+                    let l = Math.min(s * (16 / 9), Math.min(this.resultCanvas.width, this.resultCanvas.height));
                     return parseInt(Math.round(l * (533 / 990)));
                 },
                 lineSize: function () {
                     let s = Math.min(this.resultCanvas.width, this.resultCanvas.height);
-                    let l = Math.min(s * (16 / 9), Math.max(this.resultCanvas.width, this.resultCanvas.height));
+                    let l = Math.min(s * (16 / 9), Math.min(this.resultCanvas.width, this.resultCanvas.height));
+                    console.log('s=' + s, 'l=' + l);
+                    console.log(Math.round((l / 72) / 5));
+                    console.log('lineSize:', Math.min(4, parseInt(Math.round((l / 72) / 5))));
                     return Math.min(4, parseInt(Math.round((l / 72) / 5)));
                 },
                 lineShadowSize: function () {
