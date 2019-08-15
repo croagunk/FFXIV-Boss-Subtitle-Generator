@@ -2,12 +2,13 @@
 <html lang="ja">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>FFXIV Boss Subtitle Generator</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/css/uikit.min.css" integrity="sha256-1NCiLO1eL8xsDn3wFHlM37FhxQjBruKz/veyTbWSWHk=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/css/uikit.min.css" integrity="sha256-1NCiLO1eL8xsDn3wFHlM37FhxQjBruKz/veyTbWSWHk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Serif+JP&display=swap" />
     <style>
         [v-cloak] {
             display: none;
@@ -16,6 +17,10 @@
         canvas {
             width: 80vw;
         }
+
+        /* #font-test {
+            font-family: '游明朝 Demibold', 'Yu Mincho Demibold', 'YuMincho-DemiBold', '游明朝体 デミボールド', 'YuMincho Demibold', 'YuMin-Demibold', '游明朝', 'Yu Mincho', '游明朝体', 'YuMincho', serif;
+        } */
     </style>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -30,7 +35,7 @@
 </head>
 
 <body>
-    <header class="uk-section-xsmall uk-section-default uk-box-shadow-small" uk-sticky="show-on-up: true; animation: uk-aimation-slide-top;">
+    <header class="uk-position-top uk-section-xsmall uk-section-default uk-box-shadow-small" uk-sticky="show-on-up: true; animation: uk-aimation-slide-top;">
         <div class="uk-container uk-container-expand">
             <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
                 <div class="uk-navbar-left"></div>
@@ -39,17 +44,17 @@
             </nav>
         </div>
     </header>
-    <main class="uk-margin-left uk-margin-right" id="app" v-cloak>
+    <main class="uk-margin-large-top uk-margin-left uk-margin-right" id="app" v-cloak>
         <section class="uk-section uk-padding-small" id="s-file">
             <h1 class="uk-h1">画像選択</h1>
             <div class="uk-form-custom">
                 <input type="file" accept="image/png, image/jpeg" @change="fileSelected" />
                 <button class="uk-button uk-button-default" type="button" tabindex="-1">
                     <span uk-icon="icon: upload"></span>
-                    使用する画像ファイルを選択
+                    使用する画像を選択
                 </button>
             </div>
-            <span class="uk-text-middle uk-margin-left">{{ file !== null ? file.name : '選択されていません' }}</span>
+            <span class="uk-text-small uk-margin-small-left">{{ file !== null ? file.name : '選択されていません' }}</span>
         </section>
         <section class="uk-section uk-padding-small" id="s-data" v-show="isImageSelected">
             <h1 class="uk-h1">テキスト入力</h1>
@@ -72,17 +77,24 @@
             </div>
             <div class="uk-align-center" id="s-result-container">
                 <canvas id="result" :width="resultCanvas.width" :height="resultCanvas.height"></canvas>
-                <div style="display: none;">
-                    <a id="download-image">download</a>
-                </div>
             </div>
         </section>
+        <div style="display: none;">
+            <!-- <div id="font-test"></div> -->
+            <a id="download-image">download</a>
+        </div>
     </main>
+    <footer class="uk-margin-large-top uk-margin-left uk-margin-right">
+        <p class="uk-text-muted uk-text-small">
+            記載されている会社名・製品名・システム名などは、各社の商標、または登録商標です。
+        </p>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/js/uikit.min.js" integrity="sha256-Si/RSqVaI2Nt0NBCIADY5gtwKd6MVxsARUchEjnOoh4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/js/uikit-icons.min.js" integrity="sha256-xx24qw2IGUl97Dv7hUvw9UKnw2G7iVq+MmE4nkM/WJs=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js" integrity="sha256-chlNFSVx3TdcQ2Xlw7SvnbLAavAQLO0Y/LBiWX04viY=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/createjs@1.0.1/builds/1.0.0/createjs.min.js" integrity="sha256-2wdA6xeHmnRYyJJeIH/YDKhCT4DdzeLN+8T39bRO7R0=" crossorigin="anonymous"></script>
+    <script src="./js/is-installed-font.js"></script>
     <script>
         const cjs = createjs;
         const app = new Vue({
@@ -126,11 +138,24 @@
                     return parseInt(Math.round(l * 0.01875));
                 },
                 font: function () {
-                    let fontFamily = '游明朝';
+                    let fontFamily = this.validFontFamily;
                     return 'bold ' + this.fontSize + 'px ' + fontFamily;
                 },
                 fontShadowSize: function () {
                     return parseInt(Math.round(this.fontSize / 4));
+                },
+                validFontFamily: function () {
+                    let fonts = ['游明朝 Demibold', 'Yu Mincho Demibold', 'YuMincho-DemiBold', '游明朝体 デミボールド', 'YuMincho Demibold', 'YuMin-Demibold', '游明朝', 'Yu Mincho', '游明朝体', 'YuMincho'];
+
+                    let validFontFamily = 'Noto Serif JP';
+                    for (let i = 0; i < fonts.length; ++i) {
+                        if (isInstalledFont(fonts[i])) {
+                            validFontFamily = fonts[i];
+                            break;
+                        }
+                    }
+
+                    return validFontFamily;
                 },
             },
             watch: {
@@ -306,7 +331,10 @@
                     return blob;
                 },
             },
-        })
+        });
+    </script>
+    <script>
+
     </script>
 </body>
 
