@@ -16,11 +16,6 @@
         canvas {
             width: 80vw;
         }
-
-        @font-face {
-            font-family: 'Yu Mincho Demibold';
-            src: local('游明朝 Demibold'), local('Yu Mincho Demibold'), local('YuMincho-Demibold'), local('游明朝体 デミボールド'), local('YuMincho Demibold'), local('YuMin-Demibold');
-        }
     </style>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -125,8 +120,8 @@
                     return parseInt(Math.round(this.resultCanvas.width * 0.01875));
                 },
                 font: function () {
-                    let fontFamily = 'Yu Mincho Demibold';
-                    return this.fontSize + 'px ' + fontFamily;
+                    let fontFamily = '游明朝';
+                    return 'bold ' + this.fontSize + 'px ' + fontFamily;
                 },
                 fontShadowSize: function () {
                     return parseInt(Math.round(this.fontSize / 4));
