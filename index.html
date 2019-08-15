@@ -111,13 +111,15 @@
                     return parseInt(Math.round(this.resultCanvas.width * (533 / 990)));
                 },
                 lineSize: function () {
-                    return parseInt(Math.round((this.resultCanvas.height / 72) / 5));
+                    let l = Math.max(this.resultCanvas.width, this.resultCanvas.height);
+                    return Math.min(5, parseInt(Math.round((l / 72) / 5)));
                 },
                 lineShadowSize: function () {
                     return this.lineSize * 2;
                 },
                 fontSize: function () {
-                    return parseInt(Math.round(this.resultCanvas.width * 0.01875));
+                    let l = Math.max(this.resultCanvas.width, this.resultCanvas.height);
+                    return parseInt(Math.round(l * 0.01875));
                 },
                 font: function () {
                     let fontFamily = '游明朝';
