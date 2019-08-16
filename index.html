@@ -147,7 +147,7 @@
                 },
                 lineLength: function () {
                     let s = Math.min(this.resultCanvas.width, this.resultCanvas.height);
-                    let l = Math.min(s * (16 / 9), Math.min(this.resultCanvas.width, this.resultCanvas.height));
+                    let l = Math.min(s * (16 / 9), Math.max(this.resultCanvas.width, this.resultCanvas.height));
                     return parseInt(Math.round(l * (533 / 990)));
                 },
                 lineSize: function () {
