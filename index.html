@@ -31,18 +31,15 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/css/uikit.min.css" integrity="sha256-1NCiLO1eL8xsDn3wFHlM37FhxQjBruKz/veyTbWSWHk=" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Serif+JP&display=swap" />
+    <link rel="stylesheet" href="./css/style.min.css?v2.3.1" />
     <style>
         [v-cloak] {
             display: none;
         }
 
         canvas {
-            width: 80vw;
+            width: 100%;
         }
-
-        /* #font-test {
-            font-family: '游明朝 Demibold', 'Yu Mincho Demibold', 'YuMincho-DemiBold', '游明朝体 デミボールド', 'YuMincho Demibold', 'YuMin-Demibold', '游明朝', 'Yu Mincho', '游明朝体', 'YuMincho', serif;
-        } */
     </style>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -61,46 +58,52 @@
         <div class="uk-container uk-container-expand">
             <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
                 <div class="uk-navbar-left"></div>
-                <div class="uk-navbar-center"><a class="uk-navbar-item" href="#">FFXIV Boss Subtitle Generator</a></div>
+                <div class="uk-navbar-center"><span class="uk-navbar-item">FFXIV Boss Subtitle Generator</span></div>
                 <div class="uk-navbar-right"></div>
             </nav>
         </div>
     </header>
     <main class="uk-margin-large-top uk-margin-left uk-margin-right" id="app" v-cloak>
-        <section class="uk-section uk-padding-small" id="s-file">
-            <h1 class="uk-h1">画像選択</h1>
-            <div class="uk-form-custom">
-                <input type="file" accept="image/png, image/jpeg" @change="fileSelected" />
-                <button class="uk-button uk-button-default" type="button" tabindex="-1">
-                    <span uk-icon="icon: upload"></span>
-                    使用する画像を選択
-                </button>
+        <div class="uk-grid-small uk-child-width-expand@m" uk-grid>
+            <div class="uk-width-1-3@m">
+                <section class="uk-section uk-padding-small" id="s-file">
+                    <h1 class="uk-h1">画像選択</h1>
+                    <div class="uk-form-custom">
+                        <input type="file" accept="image/png, image/jpeg" @change="fileSelected" />
+                        <button class="uk-button uk-button-default" type="button" tabindex="-1">
+                            <span uk-icon="icon: upload"></span>
+                            使用する画像を選択
+                        </button>
+                    </div>
+                    <span class="uk-text-small uk-margin-small-left">{{ file !== null ? file.name : '選択されていません' }}</span>
+                </section>
+                <section class="uk-section uk-padding-small" id="s-data" v-show="isImageSelected">
+                    <h1 class="uk-h1">テキスト入力</h1>
+                    <div class="uk-form-stacked">
+                        <div>
+                            <input class="uk-input" id="subtitle-upper" type="text" placeholder="1行目" v-model="subtitles.upper" />
+                        </div>
+                        <div>
+                            <input class="uk-input" id="subtitle-lower" type="text" placeholder="2行目" v-model="subtitles.lower" />
+                        </div>
+                    </div>
+                </section>
             </div>
-            <span class="uk-text-small uk-margin-small-left">{{ file !== null ? file.name : '選択されていません' }}</span>
-        </section>
-        <section class="uk-section uk-padding-small" id="s-data" v-show="isImageSelected">
-            <h1 class="uk-h1">テキスト入力</h1>
-            <div class="uk-form-stacked">
-                <div>
-                    <input class="uk-input" id="subtitle-upper" type="text" placeholder="1行目" v-model="subtitles.upper" />
-                </div>
-                <div>
-                    <input class="uk-input" id="subtitle-lower" type="text" placeholder="2行目" v-model="subtitles.lower" />
-                </div>
+            <div class="uk-width-2-3@m">
+                    <section class="uk-section uk-padding-small" id="s-result" v-show="isImageSelected">
+                    <h1 class="uk-h1">生成結果</h1>
+                    <div class="uk-form-custom">
+                        <button class="uk-button uk-button-primary" @click="downloadImage">
+                            <span uk-icon="icon: download"></span>
+                            画像をダウンロード
+                        </button>
+                    </div>
+                    <div class="uk-align-center" id="s-result-container">
+                        <canvas id="result" :width="resultCanvas.width" :height="resultCanvas.height" ref="resultCanvas"></canvas>
+                    </div>
+                </section>
             </div>
-        </section>
-        <section class="uk-section uk-padding-small" id="s-result" v-show="isImageSelected">
-            <h1 class="uk-h1">生成結果</h1>
-            <div class="uk-form-custom">
-                <button class="uk-button uk-button-primary" @click="downloadImage">
-                    <span uk-icon="icon: download"></span>
-                    画像をダウンロード
-                </button>
-            </div>
-            <div class="uk-align-center" id="s-result-container">
-                <canvas id="result" :width="resultCanvas.width" :height="resultCanvas.height"></canvas>
-            </div>
-        </section>
+        </div>
         <div style="display: none;">
             <!-- <div id="font-test"></div> -->
             <a id="download-image">download</a>
@@ -210,7 +213,7 @@
             },
             mounted: function () {
                 // Stage
-                this.stage = new cjs.Stage(this.$el.children['s-result'].children["s-result-container"].children['result']);
+                this.stage = new cjs.Stage(this.$refs.resultCanvas);
                 cjs.Ticker.addEventListener('tick', this.stage);
             },
             methods: {
