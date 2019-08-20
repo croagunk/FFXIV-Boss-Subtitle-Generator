@@ -2,9 +2,9 @@
 <html lang="ja">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     <!-- HTML Meta Tags -->
     <title>FFXIV Boss Subtitle Generator</title>
@@ -31,16 +31,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/css/uikit.min.css" integrity="sha256-1NCiLO1eL8xsDn3wFHlM37FhxQjBruKz/veyTbWSWHk=" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Serif+JP&display=swap" />
-    <link rel="stylesheet" href="./css/style.min.css?v2.3.2" />
-    <style>
-        [v-cloak] {
-            display: none;
-        }
-
-        canvas {
-            width: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="./css/style.min.css?v2.4" />
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-63704631-2"></script>
@@ -54,7 +45,7 @@
 </head>
 
 <body>
-    <header class="uk-position-top uk-section-xsmall uk-section-default uk-box-shadow-small" uk-sticky="show-on-up: true; animation: uk-aimation-slide-top;">
+    <header class="uk-position-top uk-section-xsmall uk-section-default uk-box-shadow-medium">
         <div class="uk-container uk-container-expand">
             <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
                 <div class="uk-navbar-left"></div>
@@ -63,11 +54,13 @@
             </nav>
         </div>
     </header>
-    <main class="uk-margin-large-top uk-margin-left uk-margin-right" id="app" v-cloak>
+
+    <main id="app" class="uk-margin-left uk-margin-right" style="margin-top: 65px;" v-cloak>
         <div class="uk-grid-small uk-child-width-expand@m" uk-grid>
             <div class="uk-width-1-3@m">
-                <section class="uk-section uk-padding-small" id="s-file">
-                    <h1 class="uk-h1">画像選択</h1>
+                <!-- 画像選択 -->
+                <section id="s-select-image" class="uk-section uk-padding-small">
+                    <h2 class="uk-h2">画像選択</h2>
                     <div class="uk-form-custom">
                         <input type="file" accept="image/png, image/jpeg" @change="fileSelected" />
                         <button class="uk-button uk-button-default" type="button" tabindex="-1">
@@ -75,49 +68,194 @@
                             使用する画像を選択
                         </button>
                     </div>
-                    <span class="uk-text-small uk-margin-small-left">{{ file !== null ? file.name : '選択されていません' }}</span>
+                    <p class="uk-text-small">選択中の画像: {{ file === null ? '選択されていません' : file.name }}</p>
                 </section>
-                <section class="uk-section uk-padding-small" id="s-data" v-show="isImageSelected">
-                    <h1 class="uk-h1">テキスト入力</h1>
+                <!-- テキスト入力 -->
+                <section id="s-input-text" class="uk-section uk-padding-small" v-show="isImageSelected">
+                    <h2 class="uk-h2">テキスト入力</h2>
                     <div class="uk-form-stacked">
                         <div>
-                            <input class="uk-input" id="subtitle-upper" type="text" placeholder="1行目" v-model="subtitles.upper" />
+                            <input class="uk-input" id="subtitle-upper" type="text" placeholder="1行目" v-model="props.subtitles.upper.text" />
                         </div>
                         <div>
-                            <input class="uk-input" id="subtitle-lower" type="text" placeholder="2行目" v-model="subtitles.lower" />
+                            <input class="uk-input" id="subtitle-lower" type="text" placeholder="2行目" v-model="props.subtitles.lower.text" />
                         </div>
                     </div>
                 </section>
+                <!-- カスタマイズ -->
+                <section id="s-customize" class="uk-section uk-padding-small" v-show="isImageSelected">
+                    <ul uk-accordion>
+                        <li>
+                            <h2 class="uk-h2 uk-accordion-title uk-margin-remove" style="cursor: pointer;">カスタマイズ</h2>
+                            <div class="uk-accordion-content">
+                                <ul class="uk-child-width-expand" uk-tab>
+                                    <li class="uk-active"><a>線</a></li>
+                                    <li><a>フォント</a></li>
+                                    <li><a>テキスト</a></li>
+                                    <li><a>その他</a></li>
+                                </ul>
+                                <ul class="uk-switcher">
+                                    <!-- 線 -->
+                                    <li class="uk-section-xsmall">
+                                        <div class="uk-form-stacked">
+                                            <div>
+                                                <label class="uk-form-label uk-text-bold" for="o-line-length">長さ</label>
+                                                <div class="uk-form-controls">
+                                                    <input class="uk-range" id="o-line-length" type="range" v-model.number="props.line.length" min="0" :max="image.width" />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="uk-form-label uk-text-bold" for="o-line-size">大きさ</label>
+                                                <div class="uk-form-controls">
+                                                    <input class="uk-range" id="o-line-size" type="range" v-model.number="props.line.size" min="2" max="10" />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="uk-form-label uk-text-bold" for="o-line-location-x">横位置</label>
+                                                <div class="uk-form-controls">
+                                                    <input class="uk-range" id="o-line-location-x" type="range" v-model.number="props.line.location.x" :min="-parseInt(image.width / 2)" :max="parseInt(image.width / 2)" />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="uk-form-label uk-text-bold" for="o-line-location-y">縦位置</label>
+                                                <div class="uk-form-controls">
+                                                    <input class="uk-range" id="o-line-location-y" type="range" v-model.number="props.line.location.y" min="0" :max="image.height" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!-- フォント -->
+                                    <li class="uk-section-xsmall">
+                                        <div>
+                                            <label class="uk-form-label uk-text-bold" for="o-line-length">書体</label>
+                                            <div uk-grid>
+                                                <div class="uk-width-expand uk-margin-auto-vertical">
+                                                    <span>{{ props.font.name }}</span>
+                                                </div>
+                                                <div class="uk-width-auto">
+                                                    <button class="uk-button" type="button" id="o-font-family-select" uk-toggle="target: #o-font-family-select-dialog">選択...</button>
+                                                </div>
+                                            </div>
+                                            <!-- フォント選択ダイアログ -->
+                                            <div id="o-font-family-select-dialog" ref="fontSelectionDialog" uk-modal>
+                                                <div class="uk-modal-dialog uk-modal-body" uk-overflow-auto>
+                                                    <button class="uk-modal-close-full" type="button" uk-close></button>
+                                                    <h3 class="uk-h3">書体を選択</h3>
+                                                    <!-- フォント一覧 -->
+                                                    <div class="uk-card uk-card-small uk-card-default uk-card-body uk-margin" style="cursor: pointer;" @click="selectFont(font.name)" v-for="font in availableFontFamilies">
+                                                        <p class="uk-text-large uk-card-title" :style="{ fontFamily: font.name }">{{ font.name }}</p>
+                                                        <p class="uk-text-muted uk-text-small" v-if="font.description != null">{{ font.description }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="uk-form-label uk-text-bold">書体オプション</label>
+                                            <div class="uk-margin-small-top uk-margin-small-bottom">
+                                                <label class="uk-form-label" for="o-font-bold">
+                                                    <input class="uk-checkbox" id="o-font-bold" type="checkbox" v-model="props.font.bold" />
+                                                    太字
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="uk-form-label uk-text-bold" for="o-font-size">サイズ</label>
+                                            <div class="uk-form-controls">
+                                                <input class="uk-range" id="o-font-size" type="range" v-model.number="props.font.size" min="0" :max="parseInt(image.height / 10)" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="uk-form-label uk-text-bold">文字間隔</label>
+                                            <div class="uk-margin-small-top uk-margin-small-bottom">
+                                                <label class="uk-form-label" for="o-font-spacing">
+                                                    <input class="uk-checkbox" id="o-font-spacing" type="checkbox" v-model="props.font.spacing" />
+                                                    文字同士の間隔を広げる
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!-- テキスト -->
+                                    <li class="uk-section-xsmall">
+                                        <div>
+                                            <label class="uk-form-label uk-text-bold">テキストの追従</label>
+                                            <div class="uk-margin-small-top uk-margin-small-bottom">
+                                                <label class="uk-form-label" for="o-subtitle-follow-line">
+                                                    <input class="uk-checkbox" id="o-subtitle-follow-line" type="checkbox" v-model="props.subtitles.followSubtitleLine" />
+                                                    テキストを線に追従させる
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-upper-location-x" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">(1行目) 横位置</label>
+                                            <div class="uk-form-controls">
+                                                <input class="uk-range" id="o-subtitle-upper-location-x" type="range" v-model.number="props.subtitles.upper.location.x" :min="-parseInt(image.width / 2)" :max="parseInt(image.width / 2)" :disabled="props.subtitles.followSubtitleLine" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-upper-location-y" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">(1行目) 縦位置</label>
+                                            <div class="uk-form-controls">
+                                                <input class="uk-range" id="o-subtitle-upper-location-y" type="range" v-model.number="props.subtitles.upper.location.y" min="0" :max="image.height" :disabled="props.subtitles.followSubtitleLine" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-lower-location-x" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">(2行目) 横位置</label>
+                                            <div class="uk-form-controls">
+                                                <input class="uk-range" id="o-subtitle-lower-location-x" type="range" v-model.number="props.subtitles.lower.location.x" :min="-parseInt(image.width / 2)" :max="parseInt(image.width / 2)" :disabled="props.subtitles.followSubtitleLine" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-lower-location-y" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">(2行目) 縦位置</label>
+                                            <div class="uk-form-controls">
+                                                <input class="uk-range" id="o-subtitle-lower-location-y" type="range" v-model.number="props.subtitles.lower.location.y" min="0" :max="image.height" :disabled="props.subtitles.followSubtitleLine" />
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!-- その他 -->
+                                    <li class="uk-section-xsmall">
+                                        <div>
+                                            <label class="uk-form-label uk-text-bold">リセット</label>
+                                            <div class="uk-margin-small-top uk-margin-small-bottom">
+                                                <button type="button" class="uk-button uk-button-danger" @click="resetSettings">カスタマイズ設定をリセットする</button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
             </div>
             <div class="uk-width-2-3@m">
-                    <section class="uk-section uk-padding-small" id="s-result" v-show="isImageSelected">
-                    <h1 class="uk-h1">生成結果</h1>
+                <!-- 生成結果 -->
+                <section id="s-result" class="uk-section uk-padding-small" v-show="isImageSelected">
+                    <h2 class="uk-h2">生成結果</h2>
                     <div class="uk-form-custom">
                         <button class="uk-button uk-button-primary" @click="downloadImage">
                             <span uk-icon="icon: download"></span>
                             画像をダウンロード
                         </button>
                     </div>
-                    <div class="uk-align-center" id="s-result-container">
-                        <canvas id="result" :width="resultCanvas.width" :height="resultCanvas.height" ref="resultCanvas"></canvas>
+                    <div id="s-result-container" class="uk-align-center">
+                        <canvas id="result" :width="image.width" :height="image.height" ref="resultCanvas"></canvas>
+                        <p class="uk-text-small uk-text-muted uk-margin-remove">{{ image.width }}×{{ image.height }}</p>
                     </div>
+                    <div class="uk-hidden">
+                        <a id="download-image">download image</a>
+                    </div>
+                </section>
+                <!-- 著作権表示 -->
+                <section class="uk-section uk-margin-top uk-padding-small uk-text-left uk-text-right@m">
+                    <p class="uk-text-muted uk-text-small">
+                        記載されている会社名・製品名・システム名などは、各社の商標、または登録商標です。<br>
+                        Copyright (C) 2010 - 2019 SQUARE ENIX CO., LTD. All Rights Reserved.
+                    </p>
+                    <p class="uk-text-muted uk-text-small">
+                        &copy; 2019 croagunk.github.io
+                    </p>
                 </section>
             </div>
         </div>
-        <div style="display: none;">
-            <!-- <div id="font-test"></div> -->
-            <a id="download-image">download</a>
-        </div>
     </main>
-    <footer class="uk-margin-large-top uk-margin-left uk-margin-right">
-        <p class="uk-text-muted uk-text-small">
-            記載されている会社名・製品名・システム名などは、各社の商標、または登録商標です。<br>
-            Copyright (C) 2010 - 2019 SQUARE ENIX CO., LTD. All Rights Reserved.
-        </p>
-        <p class="uk-text-muted uk-text-small">
-            &copy; 2019 croagunk.github.io
-        </p>
-    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/js/uikit.min.js" integrity="sha256-Si/RSqVaI2Nt0NBCIADY5gtwKd6MVxsARUchEjnOoh4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/js/uikit-icons.min.js" integrity="sha256-xx24qw2IGUl97Dv7hUvw9UKnw2G7iVq+MmE4nkM/WJs=" crossorigin="anonymous"></script>
@@ -125,96 +263,214 @@
     <script src="https://cdn.jsdelivr.net/npm/createjs@1.0.1/builds/1.0.0/createjs.min.js" integrity="sha256-2wdA6xeHmnRYyJJeIH/YDKhCT4DdzeLN+8T39bRO7R0=" crossorigin="anonymous"></script>
     <script src="./js/is-installed-font.js"></script>
     <script>
+        // localStorage アクセス用
+        const storage = {
+            get: function (key) {
+                return localStorage.getItem(key);
+            },
+            set: function (key, value) {
+                localStorage.setItem(key, value);
+            },
+        };
+    </script>
+    <script>
         const cjs = createjs;
         const app = new Vue({
             el: '#app',
             data: {
-                isImageSelected: false,
-                resultCanvas: {
+                file: null,
+                image: {
+                    data: null,
                     width: 0,
                     height: 0,
                 },
-                file: null,
-                image: null,
-                subtitles: {
-                    upper: '',
-                    lower: '',
+                props: {
+                    subtitles: {
+                        followSubtitleLine: true,
+                        upper: {
+                            text: '',
+                            location: {
+                                x: 0,
+                                y: 0,
+                            },
+                        },
+                        lower: {
+                            text: '',
+                            location: {
+                                x: 0,
+                                y: 0,
+                            },
+                        },
+                    },
+                    line: {
+                        length: 0,
+                        size: 0,
+                        location: {
+                            x: 0,
+                            y: 0,
+                        },
+                    },
+                    font: {
+                        name: null,
+                        size: 0,
+                        bold: false,
+                        spacing: true,
+                    },
                 },
             },
             computed: {
+                isImageSelected: function () {
+                    return this.image.data !== null;
+                },
                 subtitleUpper: function () {
-                    return this.subtitles.upper.split('').join(' ');
+                    if (this.props.font.spacing) {
+                        return this.props.subtitles.upper.text.split('').join(' ');
+                    } else {
+                        return this.props.subtitles.upper.text;
+                    }
                 },
                 subtitleLower: function () {
-                    return this.subtitles.lower.split('').join(' ');
+                    if (this.props.font.spacing) {
+                        return this.props.subtitles.lower.text.split('').join(' ');
+                    } else {
+                        return this.props.subtitles.lower.text;
+                    }
                 },
-                lineLength: function () {
-                    let s = Math.min(this.resultCanvas.width, this.resultCanvas.height);
-                    let l = Math.min(s * (16 / 9), Math.max(this.resultCanvas.width, this.resultCanvas.height));
-                    return parseInt(Math.round(l * (533 / 990)));
+                // プロパティのデフォルト値
+                defaultLineLength: function () {
+                    let w = this.image.width;
+                    return parseInt(Math.round(w * (533 / 990)));
                 },
-                lineSize: function () {
-                    let s = Math.min(this.resultCanvas.width, this.resultCanvas.height);
-                    let l = Math.min(s * (16 / 9), Math.min(this.resultCanvas.width, this.resultCanvas.height));
-                    console.log('s=' + s, 'l=' + l);
-                    console.log(Math.round((l / 72) / 5));
-                    console.log('lineSize:', Math.min(4, parseInt(Math.round((l / 72) / 5))));
-                    return Math.min(4, parseInt(Math.round((l / 72) / 5)));
+                defaultLineSize: function () {
+                    let w = this.image.width;
+                    let h = this.image.height;
+                    let a = h;
+                    if (w * (9 / 16) < h) {
+                        a = w * (9 / 16);
+                    }
+                    return parseInt(Math.max(Math.round(a / 360), 3));
                 },
-                lineShadowSize: function () {
-                    return this.lineSize * 2;
+                defaultLineShadowSize: function () {
+                    return this.defaultLineSize * 2;
                 },
-                fontSize: function () {
-                    let s = Math.min(this.resultCanvas.width, this.resultCanvas.height);
-                    let l = Math.min(s * (16 / 9), Math.max(this.resultCanvas.width, this.resultCanvas.height));
+                defaultLineLocation: function () {
+                    let w = this.image.width;
+                    let h = this.image.height;
+                    let l = this.defaultLineLength;
+                    let a = h;
+                    let b = 0;
+                    if (w * (9 / 16) < h) {
+                        a = w * (9 / 16);
+                        b = (h - a) / 2;
+                    }
+                    return {
+                        // x: parseInt(Math.round((w - l) / 2)),
+                        x: 0,   // offset
+                        y: parseInt(Math.floor(a * (25 / 36) + b) + this.defaultLineShadowSize),
+                    };
+                },
+                defaultFontSize: function () {
+                    let s = Math.min(this.image.width, this.image.height);
+                    let l = Math.min(s * (16 / 9), Math.max(this.image.width, this.image.height));
                     return parseInt(Math.round(l * 0.01875));
                 },
+                defaultSubtitleUpperLocation: function () {
+                    let w = this.image.width;
+                    let h = this.image.height;
+                    let f = this.defaultFontSize;
+                    return {
+                        x: 0, //parseInt(Math.round(w / 2)),
+                        y: parseInt(this.defaultLineLocation.y - this.defaultLineShadowSize - f * (2 / 3)),
+                    };
+                },
+                defaultSubtitleLowerLocation: function () {
+                    let w = this.image.width;
+                    let h = this.image.height;
+                    let l = this.defaultLineSize;
+                    let f = this.defaultFontSize;
+                    return {
+                        x: 0, //parseInt(Math.round(w / 2)),
+                        y: parseInt(this.defaultLineLocation.y - this.defaultLineShadowSize + l + f),
+                    };
+                },
+                // プロパティ
+                lineShadowSize: function () {
+                    return this.props.line.size * 2;
+                },
                 font: function () {
-                    let fontFamily = this.validFontFamily;
-                    return 'bold ' + this.fontSize + 'px ' + fontFamily;
+                    let fontFamily = this.props.font.name;
+                    let fontSize = this.props.font.size;
+                    let bold = this.props.font.bold;
+                    return (bold ? 'bold ' : '') + fontSize + 'px ' + fontFamily;
                 },
                 fontShadowSize: function () {
-                    return parseInt(Math.round(this.fontSize / 4));
+                    let fontSize = this.props.font.size;
+                    return parseInt(Math.round(fontSize / 4));
                 },
-                validFontFamily: function () {
-                    let fonts = ['游明朝 Demibold', 'Yu Mincho Demibold', 'YuMincho-DemiBold', '游明朝体 デミボールド', 'YuMincho Demibold', 'YuMin-Demibold', '游明朝', 'Yu Mincho', '游明朝体', 'YuMincho'];
+                subtitleUpperLocation: function () {
+                    let w = this.image.width;
+                    let h = this.image.height;
+                    let f = this.props.font.size;
+                    if (this.props.subtitles.followSubtitleLine) {
+                        this.props.subtitles.upper.location.x = parseInt(this.props.line.location.x); //parseInt(Math.round(w / 2) + this.props.line.location.x),
+                        this.props.subtitles.upper.location.y = parseInt(this.props.line.location.y - this.lineShadowSize - f * (2 / 3));
+                    }
+                    return {
+                        x: this.props.subtitles.upper.location.x,
+                        y: this.props.subtitles.upper.location.y,
+                    };
+                },
+                subtitleLowerLocation: function () {
+                    let w = this.image.width;
+                    let h = this.image.height;
+                    let l = this.props.line.size;
+                    let f = this.props.font.size;
+                    if (this.props.subtitles.followSubtitleLine) {
+                        this.props.subtitles.lower.location.x = parseInt(this.props.line.location.x); //parseInt(Math.round(w / 2) + this.props.line.location.x),
+                        this.props.subtitles.lower.location.y = parseInt(this.props.line.location.y - this.lineShadowSize + l + f);
+                    }
+                    return {
+                        x: this.props.subtitles.lower.location.x,
+                        y: this.props.subtitles.lower.location.y,
+                    };
+                },
+                // フォント
+                availableFontFamilies: function () {
+                    let availableFontFamilies = [];
+                    let fontsYuMincho = ['游明朝 Demibold', 'Yu Mincho Demibold', 'YuMincho-DemiBold', '游明朝体 デミボールド', 'YuMincho Demibold', 'YuMin-Demibold', '游明朝', 'Yu Mincho', '游明朝体', 'YuMincho'];
+                    let fonts = [
+                        { name: 'Noto Serif JP', description: null },
+                        { name: 'Eofont', description: '英文字のみ表示可能' },
+                    ];
 
-                    let validFontFamily = 'Noto Serif JP';
-                    for (let i = 0; i < fonts.length; ++i) {
-                        if (isInstalledFont(fonts[i])) {
-                            validFontFamily = fonts[i];
+                    for (let i = 0; i < fontsYuMincho.length; ++i) {
+                        if (isInstalledFont(fontsYuMincho[i])) {
+                            availableFontFamilies.push({ name: fontsYuMincho[i], description: null });
                             break;
                         }
                     }
+                    for (let i = 0; i < fonts.length; ++i) {
+                        if (isInstalledFont(fonts[i].name)) {
+                            availableFontFamilies.push(fonts[i]);
+                        }
+                    }
 
-                    return validFontFamily;
+                    return availableFontFamilies;
                 },
             },
             watch: {
-                image: function (val, oldVal) {
-                    if (val != null) {
-                        this.isImageSelected = true;
-                    } else {
-                        this.isImageSelected = false;
-                    }
-                },
-                subtitles: {
-                    handler: function (val, oldVal) {
-                        this.drawCanvas();
-                    },
-                    deep: true,
-                },
                 file: function (val, oldVal) {
                     // 選択されたファイルの Blob URL を取得する
                     let src = window.URL.createObjectURL(this.file);
                     // 画像を読み込む
                     this.loadImage(src);
                 },
-            },
-            mounted: function () {
-                // Stage
-                this.stage = new cjs.Stage(this.$refs.resultCanvas);
-                cjs.Ticker.addEventListener('tick', this.stage);
+                props: {
+                    handler: function (val, oldVal) {
+                        this.drawCanvas();
+                    },
+                    deep: true,
+                },
             },
             methods: {
                 fileSelected: function (e) {
@@ -230,20 +486,57 @@
                 loadImage: function (src) {
                     let image = new Image();
                     image.onload = () => {
-                        // キャンバスサイズを画像に合わせる
-                        this.resultCanvas.width = image.naturalWidth;
-                        this.resultCanvas.height = image.naturalHeight;
+                        this.image.data = image;
 
-                        this.image = image;
+                        // キャンバスサイズを画像に合わせる
+                        this.image.width = image.naturalWidth;
+                        this.image.height = image.naturalHeight;
+
                         // 入力中の文字を消去
-                        this.subtitles.upper = '';
-                        this.subtitles.lower = '';
+                        this.props.subtitles.upper.text = '';
+                        this.props.subtitles.lower.text = '';
+
+                        // 設定を初期化
+                        this.clearSubtitles();
+                        this.resetSettings();
 
                         // キャンバスを初期状態で描画
                         this.drawCanvas();
                     };
                     image.src = src;
                 },
+                // 設定リセット
+                resetSettings: function () {
+                    this.resetLineSettings();
+                    this.resetFontSettings();
+                    this.resetSubtitlesSettings();
+                },
+                resetLineSettings: function () {
+                    this.props.line.length = this.defaultLineLength;
+                    this.props.line.size = this.defaultLineSize;
+                    this.props.line.location.x = this.defaultLineLocation.x;
+                    this.props.line.location.y = this.defaultLineLocation.y;
+                },
+                resetFontSettings: function () {
+                    this.props.font.name = this.availableFontFamilies[0].name;
+                    this.props.font.size = this.defaultFontSize;
+                    this.props.font.bold = false;
+                    this.props.font.spacing = true;
+                },
+                resetSubtitlesSettings: function () {
+                    this.props.subtitles.followSubtitleLine = true;
+                    // 1行目
+                    this.props.subtitles.upper.location.x = this.defaultSubtitleUpperLocation.x;
+                    this.props.subtitles.upper.location.y = this.defaultSubtitleUpperLocation.y;
+                    // 2行目
+                    this.props.subtitles.lower.location.x = this.defaultSubtitleLowerLocation.x;
+                    this.props.subtitles.lower.location.y = this.defaultSubtitleLowerLocation.y;
+                },
+                clearSubtitles: function () {
+                    this.props.subtitles.upper.text = '';
+                    this.props.subtitles.lower.text = '';
+                },
+                // 画像描画
                 drawCanvas: function () {
                     this.resetCanvas();
                     this.drawSubtitleLine();
@@ -254,58 +547,78 @@
                     // Stage の子要素をクリア
                     this.stage.removeAllChildren();
                     // 参照画像を追加
-                    this.stage.addChild(new cjs.Bitmap(this.image));
+                    this.stage.addChild(new cjs.Bitmap(this.image.data));
                 },
                 drawSubtitleLine: function () {
-                    // 線の位置
-                    let left = parseInt(Math.round((this.resultCanvas.width - this.lineLength) / 2));
-                    let top = parseInt(Math.floor(this.resultCanvas.height * (25 / 36))) + this.lineShadowSize;
+                    // 線のプロパティ
+                    let w = this.image.width;
+                    let length = this.props.line.length;
+                    let lineSize = this.props.line.size;
+                    let shadowSize = this.lineShadowSize;
+                    // let left = this.props.line.location.x;
+                    let left = this.props.line.location.x + parseInt(Math.round((w - length) / 2));
+                    let top = this.props.line.location.y;
 
                     // 線の影
-                    let g1 = new cjs.Graphics();
-                    g1.beginStroke('black')
-                        .setStrokeStyle(this.lineSize)
+                    let shdw = new cjs.Graphics();
+                    shdw.beginStroke('black')
+                        .setStrokeStyle(lineSize)
                         .moveTo(left, top)
-                        .lineTo(left + this.lineLength, top)
+                        .lineTo(left + length, top)
                         .endStroke();
-                    let s1a = new cjs.Shape(g1);
-                    let s1b = new cjs.Shape(g1);
-                    s1a.shadow = new cjs.Shadow('black', 0, 0, this.lineShadowSize);
-                    s1b.shadow = new cjs.Shadow('black', 0, 0, this.lineShadowSize);
+                    let sShdw1 = new cjs.Shape(shdw);
+                    let sShdw2 = new cjs.Shape(shdw);
+                    sShdw1.shadow = new cjs.Shadow('black', 0, 0, shadowSize);
+                    sShdw2.shadow = new cjs.Shadow('black', 0, 0, shadowSize);
+                    this.stage.addChild(sShdw1);
+                    this.stage.addChild(sShdw2);
 
-                    // 線の影を濃くするため2度描画する
-                    this.stage.addChild(s1a);
-                    this.stage.addChild(s1b);
+                    // 線の本体 (外側)
+                    let lin1 = new cjs.Graphics();
+                    lin1.beginStroke('white')
+                        .setStrokeStyle(lineSize)
+                        .moveTo(left - 1, top)
+                        .lineTo(left + length + 1, top)
+                        .endStroke();
+                    let sLin1 = new cjs.Shape(lin1);
+                    sLin1.shadow = new cjs.Shadow('black', 0, 0, shadowSize);
+                    this.stage.addChild(sLin1);
 
-                    // 線の本体
-                    let g2 = new cjs.Graphics();
-                    g2.beginStroke('white')
-                        .setStrokeStyle(this.lineSize)
+                    // 線の本体 (内側)
+                    let lin2 = new cjs.Graphics();
+                    lin2.beginStroke('white')
+                        .setStrokeStyle(lineSize - 2)
                         .moveTo(left, top)
-                        .lineTo(left + this.lineLength, top)
+                        .lineTo(left + length, top)
                         .endStroke();
-                    let s2 = new cjs.Shape(g2);
-
-                    // 線を描画する
-                    this.stage.addChild(s2);
+                    let sLin2 = new cjs.Shape(lin2);
+                    sLin2.shadow = new cjs.Shadow('black', 0, 0, shadowSize);
+                    this.stage.addChild(sLin2);
                 },
                 drawSubtitleUpper: function () {
-                    // 文字の位置
-                    let left = parseInt(Math.round(this.resultCanvas.width / 2));
-                    let top = parseInt(Math.round(this.resultCanvas.height * (25 / 36)) - this.fontSize * 2 / 3);
+                    let w = this.image.width;
+
+                    // 文字のプロパティ
+                    let font = this.font;
+                    // let left = this.props.subtitles.upper.location.x;
+                    let left = this.subtitleUpperLocation.x + parseInt(Math.round(w / 2));
+                    let top = this.subtitleUpperLocation.y;
 
                     // 文字の影
-                    var t1 = new cjs.Text(this.subtitleUpper, this.font, 'black');
+                    let t1 = new cjs.Text(this.subtitleUpper, font, 'black');
                     t1.x = left;
                     t1.y = top;
                     t1.textAlign = 'center';
                     t1.textBaseline = 'middle';
                     t1.shadow = new cjs.Shadow('black', 0, 0, this.fontShadowSize);
 
-                    this.stage.addChild(t1);
+                    let shdw1 = t1.clone();
+                    let shdw2 = t1.clone();
+                    this.stage.addChild(shdw1);
+                    this.stage.addChild(shdw2);
 
                     // 文字
-                    var t2 = new cjs.Text(this.subtitleUpper, this.font, 'white');
+                    let t2 = new cjs.Text(this.subtitleUpper, font, 'white');
                     t2.x = left;
                     t2.y = top;
                     t2.textAlign = 'center';
@@ -315,22 +628,29 @@
                     this.stage.addChild(t2);
                 },
                 drawSubtitleLower: function () {
-                    // 文字の位置
-                    let left = parseInt(Math.round(this.resultCanvas.width / 2));
-                    let top = parseInt(Math.round(this.resultCanvas.height * (25 / 36))) + this.lineSize + this.fontSize;
+                    let w = this.image.width;
+
+                    // 文字のプロパティ
+                    let font = this.font;
+                    // let left = this.props.subtitles.lower.location.x;
+                    let left = this.subtitleLowerLocation.x + parseInt(Math.round(w / 2));
+                    let top = this.subtitleLowerLocation.y;
 
                     // 文字の影
-                    var t1 = new cjs.Text(this.subtitleLower, this.font, 'black');
+                    var t1 = new cjs.Text(this.subtitleLower, font, 'black');
                     t1.x = left;
                     t1.y = top;
                     t1.textAlign = 'center';
                     t1.textBaseline = 'middle';
                     t1.shadow = new cjs.Shadow('black', 0, 0, this.fontShadowSize);
 
-                    this.stage.addChild(t1);
+                    let shdw1 = t1.clone();
+                    let shdw2 = t1.clone();
+                    this.stage.addChild(shdw1);
+                    this.stage.addChild(shdw2);
 
                     // 文字
-                    var t2 = new cjs.Text(this.subtitleLower, this.font, 'white');
+                    var t2 = new cjs.Text(this.subtitleLower, font, 'white');
                     t2.x = left;
                     t2.y = top;
                     t2.textAlign = 'center';
@@ -340,9 +660,22 @@
                     this.stage.addChild(t2);
                 },
                 downloadImage: function () {
+                    const base64toBlob = (base64) => {
+                        // https://st40.xyz/one-run/article/133/
+                        let tmp = base64.split(',');
+                        let data = atob(tmp[1]);
+                        let mime = tmp[0].split(':')[1].split(';')[0];
+                        let buf = new Uint8Array(data.length);
+                        for (let i = 0; i < data.length; ++i) {
+                            buf[i] = data.charCodeAt(i);
+                        }
+                        let blob = new Blob([buf], { type: mime });
+                        return blob;
+                    };
+
                     let canvas = document.getElementById('result');
                     let base64 = canvas.toDataURL();
-                    let blob = this.base64toBlob(base64);
+                    let blob = base64toBlob(base64);
                     let dlFileName = 'xivbosssub_' + (new Date()).getTime() + '.png';
 
                     let a = document.getElementById('download-image');
@@ -350,23 +683,18 @@
                     a.download = dlFileName;
                     a.click();
                 },
-                base64toBlob: function (base64) {
-                    // https://st40.xyz/one-run/article/133/
-                    let tmp = base64.split(',');
-                    let data = atob(tmp[1]);
-                    let mime = tmp[0].split(':')[1].split(';')[0];
-                    let buf = new Uint8Array(data.length);
-                    for (let i = 0; i < data.length; ++i) {
-                        buf[i] = data.charCodeAt(i);
-                    }
-                    let blob = new Blob([buf], { type: mime });
-                    return blob;
+                selectFont: function (fontFamily) {
+                    this.props.font.name = fontFamily;
+                    UIkit.modal(this.$refs.fontSelectionDialog).hide();
                 },
+                // プロパティ
+            },
+            mounted: function () {
+                // Stage
+                this.stage = new cjs.Stage(this.$refs.resultCanvas);
+                cjs.Ticker.addEventListener('tick', this.stage);
             },
         });
-    </script>
-    <script>
-
     </script>
 </body>
 
