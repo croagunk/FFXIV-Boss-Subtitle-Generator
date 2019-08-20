@@ -559,6 +559,10 @@
                     let left = this.props.line.location.x + parseInt(Math.round((w - length) / 2));
                     let top = this.props.line.location.y;
 
+                    if (length == 0) {
+                        return;
+                    }
+
                     // 線の影
                     let shdw = new cjs.Graphics();
                     shdw.beginStroke('black')
