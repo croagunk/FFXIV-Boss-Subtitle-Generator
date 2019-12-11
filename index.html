@@ -39,7 +39,6 @@
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'UA-63704631-2');
     </script>
 </head>
@@ -60,25 +59,25 @@
             <div class="uk-width-1-3@m">
                 <!-- 画像選択 -->
                 <section id="s-select-image" class="uk-section uk-padding-small">
-                    <h2 class="uk-h2">画像選択</h2>
+                    <h2 class="uk-h2">{{ $t('画像選択') }}</h2>
                     <div class="uk-form-custom">
                         <input type="file" accept="image/png, image/jpeg" @change="fileSelected" />
                         <button class="uk-button uk-button-default" type="button" tabindex="-1">
                             <span uk-icon="icon: upload"></span>
-                            使用する画像を選択
+                            {{ $t('使用する画像を選択') }}
                         </button>
                     </div>
-                    <p class="uk-text-small">選択中の画像: {{ file === null ? '選択されていません' : file.name }}</p>
+                    <p class="uk-text-small">{{ $t('選択中の画像') }}: {{ file === null ? $t('選択されていません') : file.name }}</p>
                 </section>
                 <!-- テキスト入力 -->
                 <section id="s-input-text" class="uk-section uk-padding-small" v-show="isImageSelected">
-                    <h2 class="uk-h2">テキスト入力</h2>
+                    <h2 class="uk-h2">{{ $t('テキスト入力') }}</h2>
                     <div class="uk-form-stacked">
                         <div>
-                            <input class="uk-input" id="subtitle-upper" type="text" placeholder="1行目" v-model="props.subtitles.upper.text" />
+                            <input class="uk-input" id="subtitle-upper" type="text" :placeholder="$t('1行目')" v-model="props.subtitles.upper.text" />
                         </div>
                         <div>
-                            <input class="uk-input" id="subtitle-lower" type="text" placeholder="2行目" v-model="props.subtitles.lower.text" />
+                            <input class="uk-input" id="subtitle-lower" type="text" :placeholder="$t('2行目')" v-model="props.subtitles.lower.text" />
                         </div>
                     </div>
                 </section>
@@ -86,38 +85,38 @@
                 <section id="s-customize" class="uk-section uk-padding-small" v-show="isImageSelected">
                     <ul uk-accordion>
                         <li>
-                            <h2 class="uk-h2 uk-accordion-title uk-margin-remove" style="cursor: pointer;">カスタマイズ</h2>
+                            <h2 class="uk-h2 uk-accordion-title uk-margin-remove" style="cursor: pointer;">{{ $t('カスタマイズ') }}</h2>
                             <div class="uk-accordion-content">
                                 <ul class="uk-child-width-expand" uk-tab="swiping: false;">
-                                    <li class="uk-active"><a>線</a></li>
-                                    <li><a>フォント</a></li>
-                                    <li><a>テキスト</a></li>
-                                    <li><a>その他</a></li>
+                                    <li class="uk-active"><a>{{ $t('線') }}</a></li>
+                                    <li><a>{{ $t('フォント') }}</a></li>
+                                    <li><a>{{ $t('テキスト') }}</a></li>
+                                    <li><a>{{ $t('その他') }}</a></li>
                                 </ul>
                                 <ul class="uk-switcher">
                                     <!-- 線 -->
                                     <li class="uk-section-xsmall">
                                         <div class="uk-form-stacked">
                                             <div>
-                                                <label class="uk-form-label uk-text-bold" for="o-line-length">長さ</label>
+                                                <label class="uk-form-label uk-text-bold" for="o-line-length">{{ $t('長さ') }}</label>
                                                 <div class="uk-form-controls">
                                                     <input class="uk-range" id="o-line-length" type="range" v-model.number="props.line.length" min="0" :max="image.width" />
                                                 </div>
                                             </div>
                                             <div>
-                                                <label class="uk-form-label uk-text-bold" for="o-line-size">大きさ</label>
+                                                <label class="uk-form-label uk-text-bold" for="o-line-size">{{ $t('大きさ') }}</label>
                                                 <div class="uk-form-controls">
                                                     <input class="uk-range" id="o-line-size" type="range" v-model.number="props.line.size" min="2" max="10" />
                                                 </div>
                                             </div>
                                             <div>
-                                                <label class="uk-form-label uk-text-bold" for="o-line-location-x">横位置</label>
+                                                <label class="uk-form-label uk-text-bold" for="o-line-location-x">{{ $t('横位置') }}</label>
                                                 <div class="uk-form-controls">
                                                     <input class="uk-range" id="o-line-location-x" type="range" v-model.number="props.line.location.x" :min="-parseInt(image.width / 2)" :max="parseInt(image.width / 2)" />
                                                 </div>
                                             </div>
                                             <div>
-                                                <label class="uk-form-label uk-text-bold" for="o-line-location-y">縦位置</label>
+                                                <label class="uk-form-label uk-text-bold" for="o-line-location-y">{{ $t('縦位置') }}</label>
                                                 <div class="uk-form-controls">
                                                     <input class="uk-range" id="o-line-location-y" type="range" v-model.number="props.line.location.y" min="0" :max="image.height" />
                                                 </div>
@@ -127,20 +126,20 @@
                                     <!-- フォント -->
                                     <li class="uk-section-xsmall">
                                         <div>
-                                            <label class="uk-form-label uk-text-bold" for="o-line-length">書体</label>
+                                            <label class="uk-form-label uk-text-bold" for="o-line-length">{{ $t('書体') }}</label>
                                             <div uk-grid>
                                                 <div class="uk-width-expand uk-margin-auto-vertical">
                                                     <span>{{ props.font.name }}</span>
                                                 </div>
                                                 <div class="uk-width-auto">
-                                                    <button class="uk-button" type="button" id="o-font-family-select" uk-toggle="target: #o-font-family-select-dialog">選択...</button>
+                                                    <button class="uk-button" type="button" id="o-font-family-select" uk-toggle="target: #o-font-family-select-dialog">{{ $t('選択...') }}</button>
                                                 </div>
                                             </div>
                                             <!-- フォント選択ダイアログ -->
                                             <div id="o-font-family-select-dialog" ref="fontSelectionDialog" uk-modal>
                                                 <div class="uk-modal-dialog uk-modal-body" uk-overflow-auto>
                                                     <button class="uk-modal-close-full" type="button" uk-close></button>
-                                                    <h3 class="uk-h3">書体を選択</h3>
+                                                    <h3 class="uk-h3">{{ $t('書体を選択') }}</h3>
                                                     <!-- フォント一覧 -->
                                                     <div class="uk-card uk-card-small uk-card-default uk-card-body uk-margin" style="cursor: pointer;" @click="selectFont(font.name)" v-for="font in availableFontFamilies">
                                                         <p class="uk-text-large uk-card-title" :style="{ fontFamily: font.name }">{{ font.name }}</p>
@@ -150,26 +149,26 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="uk-form-label uk-text-bold">書体オプション</label>
+                                            <label class="uk-form-label uk-text-bold">{{ $t('書体オプション') }}</label>
                                             <div class="uk-margin-small-top uk-margin-small-bottom">
                                                 <label class="uk-form-label" for="o-font-bold">
                                                     <input class="uk-checkbox" id="o-font-bold" type="checkbox" v-model="props.font.bold" />
-                                                    太字
+                                                    {{ $t('太字') }}
                                                 </label>
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="uk-form-label uk-text-bold" for="o-font-size">サイズ</label>
+                                            <label class="uk-form-label uk-text-bold" for="o-font-size">{{ $t('サイズ') }}</label>
                                             <div class="uk-form-controls">
                                                 <input class="uk-range" id="o-font-size" type="range" v-model.number="props.font.size" min="0" :max="parseInt(image.height / 10)" />
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="uk-form-label uk-text-bold">文字間隔</label>
+                                            <label class="uk-form-label uk-text-bold">{{ $t('文字間隔') }}</label>
                                             <div class="uk-margin-small-top uk-margin-small-bottom">
                                                 <label class="uk-form-label" for="o-font-spacing">
                                                     <input class="uk-checkbox" id="o-font-spacing" type="checkbox" v-model="props.font.spacing" />
-                                                    文字同士の間隔を広げる
+                                                    {{ $t('文字同士の間隔を広げる') }}
                                                 </label>
                                             </div>
                                         </div>
@@ -177,34 +176,34 @@
                                     <!-- テキスト -->
                                     <li class="uk-section-xsmall">
                                         <div>
-                                            <label class="uk-form-label uk-text-bold">テキストの追従</label>
+                                            <label class="uk-form-label uk-text-bold">{{ $t('テキストの追従') }}</label>
                                             <div class="uk-margin-small-top uk-margin-small-bottom">
                                                 <label class="uk-form-label" for="o-subtitle-follow-line">
                                                     <input class="uk-checkbox" id="o-subtitle-follow-line" type="checkbox" v-model="props.subtitles.followSubtitleLine" />
-                                                    テキストを線に追従させる
+                                                    {{ $t('テキストを線に追従させる') }}
                                                 </label>
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-upper-location-x" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">(1行目) 横位置</label>
+                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-upper-location-x" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">({{ $t('1行目') }}) {{ $t('横位置') }}</label>
                                             <div class="uk-form-controls">
                                                 <input class="uk-range" id="o-subtitle-upper-location-x" type="range" v-model.number="props.subtitles.upper.location.x" :min="-parseInt(image.width / 2)" :max="parseInt(image.width / 2)" :disabled="props.subtitles.followSubtitleLine" />
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-upper-location-y" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">(1行目) 縦位置</label>
+                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-upper-location-y" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">({{ $t('1行目') }}) {{ $t('縦位置') }}</label>
                                             <div class="uk-form-controls">
                                                 <input class="uk-range" id="o-subtitle-upper-location-y" type="range" v-model.number="props.subtitles.upper.location.y" min="0" :max="image.height" :disabled="props.subtitles.followSubtitleLine" />
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-lower-location-x" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">(2行目) 横位置</label>
+                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-lower-location-x" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">({{ $t('2行目') }}) {{ $t('横位置') }}</label>
                                             <div class="uk-form-controls">
                                                 <input class="uk-range" id="o-subtitle-lower-location-x" type="range" v-model.number="props.subtitles.lower.location.x" :min="-parseInt(image.width / 2)" :max="parseInt(image.width / 2)" :disabled="props.subtitles.followSubtitleLine" />
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-lower-location-y" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">(2行目) 縦位置</label>
+                                            <label class="uk-form-label uk-text-bold" for="o-subtitle-lower-location-y" :class="{ 'uk-text-muted': props.subtitles.followSubtitleLine }">({{ $t('2行目') }}) {{ $t('縦位置') }}</label>
                                             <div class="uk-form-controls">
                                                 <input class="uk-range" id="o-subtitle-lower-location-y" type="range" v-model.number="props.subtitles.lower.location.y" min="0" :max="image.height" :disabled="props.subtitles.followSubtitleLine" />
                                             </div>
@@ -213,9 +212,9 @@
                                     <!-- その他 -->
                                     <li class="uk-section-xsmall">
                                         <div>
-                                            <label class="uk-form-label uk-text-bold">リセット</label>
+                                            <label class="uk-form-label uk-text-bold">{{ $t('リセット') }}</label>
                                             <div class="uk-margin-small-top uk-margin-small-bottom">
-                                                <button type="button" class="uk-button uk-button-danger" @click="resetSettings">カスタマイズ設定をリセットする</button>
+                                                <button type="button" class="uk-button uk-button-danger" @click="resetSettings">{{ $t('カスタマイズ設定をリセットする') }}</button>
                                             </div>
                                         </div>
                                     </li>
@@ -228,11 +227,11 @@
             <div class="uk-width-2-3@m">
                 <!-- 生成結果 -->
                 <section id="s-result" class="uk-section uk-padding-small" v-show="isImageSelected">
-                    <h2 class="uk-h2">生成結果</h2>
+                    <h2 class="uk-h2">{{ $t('生成結果') }}</h2>
                     <div class="uk-form-custom">
                         <button class="uk-button uk-button-primary" @click="downloadImage">
                             <span uk-icon="icon: download"></span>
-                            画像をダウンロード
+                            {{ $t('画像をダウンロード') }}
                         </button>
                     </div>
                     <div id="s-result-container" class="uk-align-center">
@@ -253,6 +252,21 @@
                         &copy; 2019 croagunk.github.io
                     </p>
                 </section>
+
+                <section class="uk-section uk-padding-small">
+                    <div class="uk-align-right@m" uk-form-custom="target: #locale">
+                        <select v-model="$i18n.locale">
+                            <option value="en">English</option>
+                            <option value="ja">日本語</option>
+                            <option value="ko">한국어</option>
+                        </select>
+                        <button class="uk-button uk-button-secondary uk-width-auto" type="button" tabindex="-1">
+                            <span uk-icon="icon: world"></span>
+                            <span id="locale"></span>
+                            <span uk-icon="icon: chevron-down"></span>
+                        </button>
+                    </div>
+                </section>
             </div>
         </div>
     </main>
@@ -260,6 +274,7 @@
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/js/uikit.min.js" integrity="sha256-Si/RSqVaI2Nt0NBCIADY5gtwKd6MVxsARUchEjnOoh4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.1.7/dist/js/uikit-icons.min.js" integrity="sha256-xx24qw2IGUl97Dv7hUvw9UKnw2G7iVq+MmE4nkM/WJs=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js" integrity="sha256-chlNFSVx3TdcQ2Xlw7SvnbLAavAQLO0Y/LBiWX04viY=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-i18n@8.15.1/dist/vue-i18n.min.js" integrity="sha256-Smvv4oz9v/FRpT3sk6qiAHAln3LWPPko9R8tBiGTKJU=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/createjs@1.0.1/builds/1.0.0/createjs.min.js" integrity="sha256-2wdA6xeHmnRYyJJeIH/YDKhCT4DdzeLN+8T39bRO7R0=" crossorigin="anonymous"></script>
     <script src="./js/is-installed-font.js"></script>
     <script>
@@ -698,6 +713,76 @@
                 this.stage = new cjs.Stage(this.$refs.resultCanvas);
                 cjs.Ticker.addEventListener('tick', this.stage);
             },
+            i18n: new VueI18n({
+                locale: navigator.language ? navigator.language.substr(0, 2) : 'ja',
+                fallbackLocale: 'ja',
+                messages: {
+                    en: {
+                        '画像選択': 'Select image',
+                        '使用する画像を選択': 'Select an image',
+                        '選択中の画像': 'Image selected',
+                        '選択されていません': 'none',
+                        'テキスト入力': 'Enter text',
+                        '1行目': 'Upper text',
+                        '2行目': 'Lower text',
+                        'カスタマイズ': 'Options',
+                        '線': 'Line',
+                        'フォント': 'Font',
+                        'テキスト': 'Text',
+                        'その他': 'Others',
+                        '長さ': 'Length',
+                        '大きさ': 'Size',
+                        '横位置': 'Horizontal position',
+                        '縦位置': 'Vertical position',
+                        '書体': 'Font',
+                        '選択...': 'Select...',
+                        '書体を選択': 'Select font',
+                        '書体オプション': 'Font options',
+                        '太字': 'Bold',
+                        'サイズ': 'Size',
+                        '文字間隔': 'Letter spacing',
+                        '文字同士の間隔を広げる': 'Wide letter spacing',
+                        'テキストの追従': 'Text alignment',
+                        'テキストを線に追従させる': 'Follow the line',
+                        'リセット': 'Reset',
+                        'カスタマイズ設定をリセットする': 'Reset all options',
+                        '生成結果': 'Result',
+                        '画像をダウンロード': 'Download image',
+                    },
+                    ko: {
+                        '画像選択': '이미지 선택',
+                        '使用する画像を選択': '이미지 선택하기',
+                        '選択中の画像': '선택된 이미지',
+                        '選択されていません': '없음',
+                        'テキスト入力': '텍스트 입력',
+                        '1行目': '상단',
+                        '2行目': '하단',
+                        'カスタマイズ': '옵션',
+                        '線': '선',
+                        'フォント': '폰트',
+                        'テキスト': '텍스트',
+                        'その他': '기타',
+                        '長さ': '길이',
+                        '大きさ': '두께',
+                        '横位置': '좌우 위치',
+                        '縦位置': '상하 위치',
+                        '書体': '폰트',
+                        '選択...': '선택...',
+                        '書体を選択': '폰트 선택',
+                        '書体オプション': '폰트 옵션',
+                        '太字': '굵게',
+                        'サイズ': '크기',
+                        '文字間隔': '글자 간격',
+                        '文字同士の間隔を広げる': '글자끼리 간격 넓히기',
+                        'テキストの追従': '텍스트 위치',
+                        'テキストを線に追従させる': '선 따라가기',
+                        'リセット': '리셋',
+                        'カスタマイズ設定をリセットする': '모든 옵션 리셋하기',
+                        '生成結果': '결과',
+                        '画像をダウンロード': '이미지 다운로드',
+                    },
+                },
+            }),
         });
     </script>
 </body>
