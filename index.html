@@ -714,7 +714,8 @@
                 cjs.Ticker.addEventListener('tick', this.stage);
             },
             i18n: new VueI18n({
-                locale: 'ja',
+                locale: navigator.language ? navigator.language.substr(0, 2) : 'ja',
+                fallbackLocale: 'ja',
                 messages: {
                     en: {
                         '画像選択': 'Select image',
