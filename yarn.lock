@@ -1273,6 +1273,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/uikit@^3.14.0":
+  version "3.14.0"
+  resolved "https://registry.yarnpkg.com/@types/uikit/-/uikit-3.14.0.tgz#8951f4ad2469297b0ba1d9dd810a180ac2ed69c1"
+  integrity sha512-1d3UY6h6PVfkvOxINerFUVvlseP9hk4lfdtmWoIEbtCgQSYyrX8gd7VbibLa7K+LkD8DpyYm0+yA/7OO7FmXDQ==
+
 "@types/webpack-env@^1.15.2":
   version "1.17.0"
   resolved "https://registry.yarnpkg.com/@types/webpack-env/-/webpack-env-1.17.0.tgz#f99ce359f1bfd87da90cc4a57cab0a18f34a48d0"
@@ -5929,6 +5934,11 @@ typescript@~4.5.5:
   version "4.5.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.5.5.tgz#d8c953832d28924a9e3d37c73d729c846c5896f3"
   integrity sha512-TCTIul70LyWe6IJWT8QSYeA54WQe8EjQFU4wY52Fasj5UKx88LNYKCgBEHcOMOrFF1rKGbD8v/xcNWVUq9SymA==
+
+uikit@^3.15.1:
+  version "3.15.1"
+  resolved "https://registry.yarnpkg.com/uikit/-/uikit-3.15.1.tgz#142b3163b962d211a879fbe759c95f28db495c3e"
+  integrity sha512-kBmL9i0VwF0JlVHmd++ZXQ5Kn0Uj9if/ejxtnt+fTlRDWTMrqFcf9eVjR98PjI6BSBi/W9LoSBWsrEDkdA+ikQ==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"
