@@ -1,7 +1,15 @@
-import { createStore } from 'vuex'
+import { InjectionKey } from 'vue'
+import { createStore, useStore as baseUseStore, Store } from 'vuex'
 
-export default createStore({
+export interface State {
+  file: string
+}
+
+export const key: InjectionKey<Store<State>> = Symbol()
+
+export const store = createStore<State>({
   state: {
+    file: ''
   },
   getters: {
   },
@@ -12,3 +20,7 @@ export default createStore({
   modules: {
   }
 })
+
+export function useStore() {
+  return baseUseStore(key)
+}

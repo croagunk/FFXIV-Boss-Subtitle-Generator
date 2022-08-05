@@ -1,8 +1,13 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import store from './store'
+import { useStore } from './store'
 
-createApp(App).use(store).mount('#app')
+const app = createApp(App)
+const store = useStore()
+
+app.config.globalProperties.$store = store
+app.use(store)
+app.mount('#app')
 
 import UIkit from 'uikit'
 import Icons from 'uikit/dist/js/uikit-icons'

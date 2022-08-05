@@ -1,13 +1,18 @@
 <template>
-  <main></main>
+  <main>
+    <SelectImage />
+  </main>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import SelectImage from "./MainComponent/SelectImage.vue";
 
 export default defineComponent({
   name: "MainComponent",
-  components: {},
+  components: {
+    SelectImage,
+  },
 });
 </script>
 
