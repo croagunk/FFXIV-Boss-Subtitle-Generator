@@ -1,14 +1,15 @@
-import { createStore } from 'vuex'
+import { createStore } from "vuex";
 
 export default createStore({
   state: {
+    file: null,
   },
-  getters: {
-  },
+  getters: {},
   mutations: {
+    setFile: (state, file) => {
+      state.file = file;
+    },
   },
-  actions: {
-  },
-  modules: {
-  }
-})
+  actions: {},
+  modules: {},
+});
