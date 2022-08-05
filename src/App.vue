@@ -1,14 +1,16 @@
 <template>
-  <div></div>
+  <HeaderComponent />
 </template>
 
 <script>
+import HeaderComponent from "@/components/HeaderComponent";
+
 export default {
-  name: 'App',
+  name: "App",
   components: {
-  }
-}
+    HeaderComponent,
+  },
+};
 </script>
 
-<style lang="stylus">
-</style>
+<style lang="stylus"></style>
